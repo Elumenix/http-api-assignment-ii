@@ -12,7 +12,7 @@
     let user;
     let options;
 
-    const sendData = () => fetch(user.action, options);
+    const sendData = () => fetch(user.children[0].value, options);
 
 
     window.onload = () => {

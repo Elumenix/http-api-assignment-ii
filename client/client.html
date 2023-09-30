@@ -11,6 +11,7 @@
     let name;
     let user;
     let options;
+    let display;
 
     const sendData = () => fetch(user.children[0].value, options);
 
@@ -21,23 +22,37 @@
       name = document.querySelector('#nameForm');
       user = document.querySelector('#userForm');
 
+      // create a new field to hold the ID
+      display = document.createElement("div");
+      display.id = "display";
+      display.style.fontWeight = "bold";
+      display.style.marginTop = "100px";
+      display.style.fontSize = "2em";
+      display.style.textAlign = "center";
+      display.style.marginBottom = "-80px";
+      content.parentNode.insertBefore(display, content);
+
+
+      user.onsubmit = (event) => {
+        event.preventDefault();
+      }
+
       submit.onclick = () => {
-        let returned; 
+        let returned;
 
         options = {
           method: user.method.toUpperCase(),
           headers: { 'accept': 'application/json' },
         }
 
-        console.log(user.action);
-        console.log(options);
-
         returned = sendData();
 
-        returned.then = (e => {
-          console.log(e);
+        returned.then((response) => {
+          return response.json();
+        }).then((data) => {
+          display.innerHTML = "Success";
 
-          content.innerHTML = e.value;
+          content.innerHTML = data;
         })
       }
     }

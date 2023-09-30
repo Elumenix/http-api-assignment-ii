@@ -1,14 +1,15 @@
 const http = require('http');
+const url = require('url');
 const htmlHandler = require('./htmlResponses.js');
 const jsonHandler = require('./jsonResponses.js');
 
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
 const onRequest = (request, response) => {
-  console.log(request.url);
+  const { pathname } = url.parse(request.url);
+  console.log(pathname);
 
-  console.log("atempting");
-  switch (request.url) {
+  switch (pathname) {
     case '/':
       htmlHandler.getIndex(request, response);
       break;
@@ -16,7 +17,6 @@ const onRequest = (request, response) => {
       htmlHandler.getCSS(request, response);
       break;
     case '/getUsers':
-      console.log("correct branch");
       jsonHandler.getUsers(request, response);
       break;
     default:

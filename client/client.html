@@ -7,6 +7,7 @@
 
   <script>
     let submit;
+    let userSubmit;
     let content;
     let name;
     let user;
@@ -15,9 +16,12 @@
 
     const sendData = () => fetch(user.children[0].value, options);
 
+    const sendUserData = () => fetch('/userPath', options);
+
 
     window.onload = () => {
       submit = document.querySelector('#userForm > input:nth-child(3)');
+      userSubmit = document.querySelector('#nameForm > input:nth-child(5)');
       content = document.querySelector('#content');
       name = document.querySelector('#nameForm');
       user = document.querySelector('#userForm');
@@ -37,8 +41,14 @@
         event.preventDefault();
       }
 
+      name.onsubmit = (event) => {
+        event.preventDefault();
+      }
+
       submit.onclick = () => {
         let returned;
+        display.innerHTML = "";
+        content.innerHTML = "";
 
         options = {
           method: user.children[1].value.toUpperCase(),
@@ -55,12 +65,49 @@
             return response.json();
           }
 
-          content.innerHTML = "";
         }).then((data) => {
           if (data) {
             content.innerHTML = JSON.stringify(data.users);
           }
         })
+      }
+
+      userSubmit.onclick = () => {
+        let returned;
+        display.innerHTML = "";
+        content.innerHTML = "";
+
+        const formData = `name=${name.children[1].value}&age=${name.children[3].value}`;
+
+        options = {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/json',
+          },
+          body: formData,
+        }
+
+        returned = sendUserData();
+
+        returned.then((response) => {
+          if (response.status !== 204) {
+            return response.json();
+          }
+        }).then((data) => {
+          display.innerHTML = "Updated (No Content)";
+
+          if (data != null) {
+            if (data.id && data.id == "missingParams") {
+              display.innerHTML = "Bad Request";
+            }
+            else {
+              display.innerHTML = "Created";
+            }
+
+            content.innerHTML = "Message: " + data.message;
+          }
+        });
       }
     }
   </script>

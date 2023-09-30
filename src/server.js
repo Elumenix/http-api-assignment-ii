@@ -5,23 +5,33 @@ const jsonHandler = require('./jsonResponses.js');
 
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
+const urlStruct = {
+  GET: {
+    '/': htmlHandler.getIndex,
+    '/style.css': htmlHandler.getCSS,
+    '/getUsers': jsonHandler.getUsers,
+    notFound: htmlHandler.getIndex
+  },
+  HEAD: {
+    '/getUsers': jsonHandler.getUsersMeta,
+    notFound: htmlHandler.getIndex,
+  },
+};
+
 const onRequest = (request, response) => {
   const { pathname } = url.parse(request.url);
+  console.log(request.method);
   console.log(pathname);
 
-  switch (pathname) {
-    case '/':
-      htmlHandler.getIndex(request, response);
-      break;
-    case '/style.css':
-      htmlHandler.getCSS(request, response);
-      break;
-    case '/getUsers':
-      jsonHandler.getUsers(request, response);
-      break;
-    default:
-      htmlHandler.getIndex(request, response);
+  if (!urlStruct[request.method]) {
+    return urlStruct.HEAD.notFound(request, response);
   }
+
+  if (urlStruct[request.method][pathname]) {
+    return urlStruct[request.method][pathname](request, response);
+  }
+
+  return urlStruct[request.method].notFound(request, response);
 };
 
 http.createServer(onRequest).listen(port, () => {

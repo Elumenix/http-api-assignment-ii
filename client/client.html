@@ -41,18 +41,25 @@
         let returned;
 
         options = {
-          method: user.method.toUpperCase(),
+          method: user.children[1].value.toUpperCase(),
           headers: { 'accept': 'application/json' },
         }
 
         returned = sendData();
 
         returned.then((response) => {
-          return response.json();
-        }).then((data) => {
+          console.log(response);
           display.innerHTML = "Success";
 
-          content.innerHTML = data;
+          if (options.method == "GET") {
+            return response.json();
+          }
+
+          content.innerHTML = "";
+        }).then((data) => {
+          if (data) {
+            content.innerHTML = JSON.stringify(data.users);
+          }
         })
       }
     }

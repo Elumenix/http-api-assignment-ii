@@ -1,8 +1,10 @@
+const users = {};
+
 const getUsers = (request, response) => {
   response.writeHead(200, { 'Content-Type': request.headers.accept });
 
   let content = {
-    message: 'Please work',
+    users,
   };
 
   content = JSON.stringify(content);
@@ -11,4 +13,10 @@ const getUsers = (request, response) => {
   response.end();
 };
 
+const getUsersMeta = (request, response) => {
+  response.writeHead(200, { 'Content-Type': request.headers.accept });
+  response.end();
+}
+
 module.exports.getUsers = getUsers;
+module.exports.getUsersMeta = getUsersMeta;

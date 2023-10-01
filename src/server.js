@@ -54,8 +54,6 @@ const onRequest = (request, response) => {
     request.headers.accept = 'application/json';
   }
 
-  console.log(request.headers.accept);
-
   if (!urlStruct[request.method]) {
     return urlStruct.HEAD.notFound(request, response);
   }

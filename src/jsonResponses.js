@@ -6,7 +6,7 @@ const updateUsers = (request, response, body) => {
   };
 
   if (!body.name || !body.age) {
-    responseJSON.id = 'missingParams';
+    responseJSON.id = 'addUserMissingParams';
     response.writeHead(400, { 'Content-Type': 'application/json' });
     response.write(JSON.stringify(responseJSON));
     response.end();

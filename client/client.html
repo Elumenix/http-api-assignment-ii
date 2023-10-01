@@ -6,28 +6,9 @@
   <link rel="stylesheet" type="text/css" href="/style.css">
 
   <script>
-    let submit;
-    let userSubmit;
-    let content;
-    let name;
-    let user;
-    let options;
-    let display;
-
-    const sendData = () => fetch(user.children[0].value, options);
-
-    const sendUserData = () => fetch('/userPath', options);
-
-
     window.onload = () => {
-      submit = document.querySelector('#userForm > input:nth-child(3)');
-      userSubmit = document.querySelector('#nameForm > input:nth-child(5)');
-      content = document.querySelector('#content');
-      name = document.querySelector('#nameForm');
-      user = document.querySelector('#userForm');
-
-      // create a new field to hold the ID
-      display = document.createElement("div");
+      const content = document.querySelector('#content');
+      const display = document.createElement("div");
       display.id = "display";
       display.style.fontWeight = "bold";
       display.style.marginTop = "100px";
@@ -35,93 +16,91 @@
       display.style.textAlign = "center";
       display.style.marginBottom = "-80px";
       content.parentNode.insertBefore(display, content);
-
-
-      user.onsubmit = (event) => {
-        event.preventDefault();
-      }
-
-      name.onsubmit = (event) => {
-        event.preventDefault();
-      }
-
-      submit.onclick = () => {
-        let returned;
-        display.innerHTML = "";
-        content.innerHTML = "";
-
-        options = {
-          method: user.children[1].value.toUpperCase(),
-          headers: { 'accept': 'application/json' },
+  
+      const sendData = (url, options) => fetch(url, options);
+  
+      const formSubmit = (form) => {
+        form.onsubmit = (event) => {
+          event.preventDefault();
         }
-
-        returned = sendData();
-
-        returned.then((response) => {
-          if (response.status !== 404) {
-          display.innerHTML = "Success";
-          }
-          else {
-            display.innerHTML = "Not Found";
-          }
-
-          if (options.method == "GET") {
-            return response.json();
-          }
-
-        }).then((data) => {
-          if (data) {
-            console.log(data);
-            if (data.users) {
-            content.innerHTML = JSON.stringify(data.users);
+  
+        form.children[form.children.length - 1].onclick = () => {
+          let returned;
+          display.innerHTML = "";
+          content.innerHTML = "";
+  
+          let options;
+          let url;
+          if (form.id === 'userForm') {
+            url = form.children[0].value;
+            options = {
+              method: form.children[1].value.toUpperCase(),
+              headers: { 'accept': 'application/json' },
             }
-            else {
-              content.innerHTML = "Message: " + data.message;
+          } else {
+            url = '/userPath';
+            const formData = `name=${form.children[1].value}&age=${form.children[3].value}`;
+            options = {
+              method: "POST",
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'application/json',
+              },
+              body: formData,
             }
           }
-        })
-      }
-
-      userSubmit.onclick = () => {
-        let returned;
-        display.innerHTML = "";
-        content.innerHTML = "";
-
-        const formData = `name=${name.children[1].value}&age=${name.children[3].value}`;
-
-        options = {
-          method: "POST",
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Accept': 'application/json',
-          },
-          body: formData,
+  
+          returned = sendData(url, options);
+  
+          returned.then((response) => {
+            if (response.status === 404) {
+              if (options.method === "GET") {
+                return response.json().then((data) => {
+                  console.log(data);
+                  if (data.id && data.id == "addUserMissingParams") {
+                    display.innerHTML = "Bad Request";
+                  } else {
+                    display.innerHTML = "Not Found";
+                  }
+                  if (data.message) {
+                    content.innerHTML = "Message: " + data.message;
+                  }
+                });
+              } else {
+                display.innerHTML = "Not Found";
+              }
+            } else if (response.status === 204) {
+              display.innerHTML = "Updated (No Content)";
+            } else {
+              display.innerHTML = "Success";
+            }
+  
+            if (options.method !== "HEAD" && response.status !== 204 && response.headers.get('content-type').includes('application/json')) {
+              return response.json();
+            }
+  
+          }).then((data) => {
+            if (data) {
+              console.log(data);
+              if (data.users) {
+                content.innerHTML = JSON.stringify(data.users);
+              }
+              else if (data.id && data.id == "addUserMissingParams") {
+                display.innerHTML = "Bad Request";
+                content.innerHTML += "Message: " + data.message;
+              }
+              else if (data.message) {
+                content.innerHTML += "Message: " + data.message;
+              }
+            }
+          });
         }
-
-        returned = sendUserData();
-
-        returned.then((response) => {
-          if (response.status !== 204) {
-            return response.json();
-          }
-        }).then((data) => {
-          display.innerHTML = "Updated (No Content)";
-
-          if (data) {
-            console.log(data);
-            if (data.id && data.id == "missingParams") {
-              display.innerHTML = "Bad Request";
-            }
-            else {
-              display.innerHTML = "Created";
-            }
-
-            content.innerHTML = "Message: " + data.message;
-          }
-        });
       }
+  
+      formSubmit(document.querySelector('#userForm'));
+      formSubmit(document.querySelector('#nameForm'));
     }
-  </script>
+  </script>  
 </head>
 
 <body>

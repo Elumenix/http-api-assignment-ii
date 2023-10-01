@@ -16,19 +16,19 @@
       display.style.textAlign = "center";
       display.style.marginBottom = "-80px";
       content.parentNode.insertBefore(display, content);
-  
+
       const sendData = (url, options) => fetch(url, options);
-  
+
       const formSubmit = (form) => {
         form.onsubmit = (event) => {
           event.preventDefault();
         }
-  
+
         form.children[form.children.length - 1].onclick = () => {
           let returned;
           display.innerHTML = "";
           content.innerHTML = "";
-  
+
           let options;
           let url;
           if (form.id === 'userForm') {
@@ -49,9 +49,9 @@
               body: formData,
             }
           }
-  
+
           returned = sendData(url, options);
-  
+
           returned.then((response) => {
             if (response.status === 404) {
               if (options.method === "GET") {
@@ -71,14 +71,17 @@
               }
             } else if (response.status === 204) {
               display.innerHTML = "Updated (No Content)";
-            } else {
+            } else if (response.status === 201) {
+              display.innerHTML = "Created";
+            }
+            else {
               display.innerHTML = "Success";
             }
-  
+
             if (options.method !== "HEAD" && response.status !== 204 && response.headers.get('content-type').includes('application/json')) {
               return response.json();
             }
-  
+
           }).then((data) => {
             if (data) {
               console.log(data);
@@ -96,11 +99,11 @@
           });
         }
       }
-  
+
       formSubmit(document.querySelector('#userForm'));
       formSubmit(document.querySelector('#nameForm'));
     }
-  </script>  
+  </script>
 </head>
 
 <body>

@@ -54,6 +54,24 @@ const getUsersMeta = (request, response) => {
   response.end();
 };
 
+const notFound = (request, response) => {
+  response.writeHead(404, { 'Content-Type': request.headers.accept });
+  const content = {
+    message: 'The page you are looking for was not found.',
+    id: 'notFound',
+  };
+
+  response.write(JSON.stringify(content));
+  response.end();
+};
+
+const notFoundMeta = (request, response) => {
+  response.writeHead(404, { 'Content-Type': request.headers.accept });
+  response.end();
+};
+
 module.exports.getUsers = getUsers;
 module.exports.getUsersMeta = getUsersMeta;
 module.exports.updateUsers = updateUsers;
+module.exports.notFound = notFound;
+module.exports.notFoundMeta = notFoundMeta;

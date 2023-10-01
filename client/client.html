@@ -58,8 +58,12 @@
         returned = sendData();
 
         returned.then((response) => {
-          console.log(response);
+          if (response.status !== 404) {
           display.innerHTML = "Success";
+          }
+          else {
+            display.innerHTML = "Not Found";
+          }
 
           if (options.method == "GET") {
             return response.json();
@@ -67,7 +71,13 @@
 
         }).then((data) => {
           if (data) {
+            console.log(data);
+            if (data.users) {
             content.innerHTML = JSON.stringify(data.users);
+            }
+            else {
+              content.innerHTML = "Message: " + data.message;
+            }
           }
         })
       }
@@ -97,7 +107,8 @@
         }).then((data) => {
           display.innerHTML = "Updated (No Content)";
 
-          if (data != null) {
+          if (data) {
+            console.log(data);
             if (data.id && data.id == "missingParams") {
               display.innerHTML = "Bad Request";
             }
